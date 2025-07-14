@@ -43,12 +43,16 @@ class Trainer:
         self.model.eval()
         running_loss, correct, total = 0.0, 0, 0
         with torch.no_grad():
-            for inputs, targets in loader:
-                inputs, targets = inputs.to(self.device), targets.to(self.device)
+            for batch in loader:
+                inputs = {
+                    "input_ids": batch['input_ids'].to(self.device),
+                    "attention_mask": batch['attention_mask'].to(self.device),
+                }
+                targets = batch['labels'].to(self.device)
                 outputs = self.model(inputs)
                 loss = self.criterion(outputs, targets)
 
-                running_loss += loss.item() * inputs.size(0)
+                running_loss += loss.item() * targets.size(0)
                 _, predicted = outputs.max(1)
                 total += targets.size(0)
                 correct += predicted.eq(targets).sum().item()
