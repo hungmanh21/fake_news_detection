@@ -1,0 +1,26 @@
+seed: 42
+batch_size: 64
+num_epochs: 5
+learning_rate: 0.001
+data:
+  csv_file: ./data/fake_news/processed/gossipcop_processed.csv
+  test_size: 0.2
+  batch_size: 32
+tokenizer:
+  name: bert-base-uncased
+  max_length: 128
+project: fake_news_classification
+wandb:
+  enabled: true
+  run_name: baseline_bert_classifier
+  project: fake_news_classification_project
+model:
+  name: simple_bert_classifier
+  model_name: bert-base-uncased
+  tokenizer_name: bert-base-uncased
+  num_classes: 2
+  pretrained: true
+  dropout: 0.1
+train:
+  log_interval: 100
+  save_dir: ./experiments/exp_01
