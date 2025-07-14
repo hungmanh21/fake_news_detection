@@ -23,13 +23,16 @@ def main(config_path):
     logger.info(f"Using device: {device}")
 
     # init wandb if available
+    wandb_tracking = True
     if cfg.get('wandb', {}).get('enabled', False):
         from src.tracking.wandb import init_wandb
         run = init_wandb(cfg['wandb']['run_name'], cfg['wandb']['project'], cfg)
         if run is None:
             logger.warning("WandB initialization failed. Continuing without logging.")
+            wandb_tracking = False
     else:
         logger.info("WandB logging is disabled.")
+        wandb_tracking = False
 
     # Load data
     data_loader = NewsDataLoader(cfg['data']['csv_file'],
@@ -42,7 +45,7 @@ def main(config_path):
     model = SimpleBertClassifier().to(device)
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=cfg['learning_rate'])
-    trainer = Trainer(model, optimizer, criterion, device)
+    trainer = Trainer(model, optimizer, criterion, device, wandb_tracking)
 
     best_val_acc = 0.0
     os.makedirs(cfg['train']['save_dir'], exist_ok=True)

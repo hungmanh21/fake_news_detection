@@ -3,11 +3,12 @@ from tqdm import tqdm
 import wandb
 
 class Trainer:
-    def __init__(self, model, optimizer, criterion, device):
+    def __init__(self, model, optimizer, criterion, device, wandb: bool = False):
         self.model = model
         self.optimizer = optimizer
         self.criterion = criterion
         self.device = device
+        self.wandb = wandb
 
     def train_epoch(self, loader):
         self.model.train()
@@ -30,10 +31,11 @@ class Trainer:
             correct += predicted.eq(targets).sum().item()
 
         # log to wandb if available
-        wandb.log({
-            'train_loss': running_loss / total,
-            'train_accuracy': correct / total
-        })
+        if self.wandb:
+            wandb.log({
+                'train_loss': running_loss / total,
+                'train_accuracy': correct / total
+            })
 
         return running_loss / total, correct / total
 
