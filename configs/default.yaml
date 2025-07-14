@@ -1,7 +1,7 @@
 seed: 42
 batch_size: 64
-num_epochs: 5
-learning_rate: 0.001
+num_epochs: 10
+learning_rate: 0.0001
 data:
   csv_file: ./data/fake_news/processed/gossipcop_processed.csv
   test_size: 0.2
