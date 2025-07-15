@@ -51,12 +51,16 @@ def main(config_path):
     os.makedirs(cfg['train']['save_dir'], exist_ok=True)
 
     for epoch in range(cfg['num_epochs']):
-        train_loss, train_acc = trainer.train_epoch(train_loader)
-        val_loss, val_acc = trainer.eval_epoch(val_loader)
+        train_loss, train_acc, train_precision, train_recall, train_f1 = trainer.train_epoch(train_loader)
+        val_loss, val_acc, val_precision, val_recall, val_f1 = trainer.eval_epoch(val_loader)
 
-        logger.info(f"Epoch {epoch + 1}/{cfg['num_epochs']} | "
-                    f"Train loss: {train_loss:.4f}, acc: {train_acc:.4f} | "
-                    f"Val loss: {val_loss:.4f}, acc: {val_acc:.4f}")
+        logger.info(
+            f"Epoch {epoch + 1}/{cfg['num_epochs']} | "
+            f"Train loss: {train_loss:.4f}, acc: {train_acc:.4f}, "
+            f"precision: {train_precision:.4f}, recall: {train_recall:.4f}, f1: {train_f1:.4f} | "
+            f"Val loss: {val_loss:.4f}, acc: {val_acc:.4f}, "
+            f"precision: {val_precision:.4f}, recall: {val_recall:.4f}, f1: {val_f1:.4f}"
+        )
 
         if val_acc > best_val_acc:
             best_val_acc = val_acc

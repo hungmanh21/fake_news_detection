@@ -1,6 +1,7 @@
 import torch
 from tqdm import tqdm
 import wandb
+from sklearn.metrics import precision_score, recall_score, f1_score
 
 class Trainer:
     def __init__(self, model, optimizer, criterion, device, wandb: bool = False):
@@ -13,9 +14,11 @@ class Trainer:
     def train_epoch(self, loader):
         self.model.train()
         running_loss, correct, total = 0.0, 0, 0
+        all_targets, all_predictions = [], []
+
         for batch in tqdm(loader, desc='Train', leave=False):
             inputs = {
-                "input_ids" : batch['input_ids'].to(self.device),
+                "input_ids": batch['input_ids'].to(self.device),
                 "attention_mask": batch['attention_mask'].to(self.device),
             }
             targets = batch['labels'].to(self.device)
@@ -30,18 +33,32 @@ class Trainer:
             total += targets.size(0)
             correct += predicted.eq(targets).sum().item()
 
-        # log to wandb if available
+            # Collect predictions and targets for metrics calculation
+            all_targets.extend(targets.cpu().numpy())
+            all_predictions.extend(predicted.cpu().numpy())
+
+        # Calculate metrics
+        precision = precision_score(all_targets, all_predictions, average='weighted')
+        recall = recall_score(all_targets, all_predictions, average='weighted')
+        f1 = f1_score(all_targets, all_predictions, average='weighted')
+
+        # Log to wandb if available
         if self.wandb:
             wandb.log({
                 'train_loss': running_loss / total,
-                'train_accuracy': correct / total
+                'train_accuracy': correct / total,
+                'train_precision': precision,
+                'train_recall': recall,
+                'train_f1': f1
             })
 
-        return running_loss / total, correct / total
+        return running_loss / total, correct / total, precision, recall, f1
 
     def eval_epoch(self, loader):
         self.model.eval()
         running_loss, correct, total = 0.0, 0, 0
+        all_targets, all_predictions = [], []
+
         with torch.no_grad():
             for batch in loader:
                 inputs = {
@@ -57,4 +74,23 @@ class Trainer:
                 total += targets.size(0)
                 correct += predicted.eq(targets).sum().item()
 
-        return running_loss / total, correct / total
+                # Collect predictions and targets for metrics calculation
+                all_targets.extend(targets.cpu().numpy())
+                all_predictions.extend(predicted.cpu().numpy())
+
+        # Calculate metrics
+        precision = precision_score(all_targets, all_predictions, average='weighted')
+        recall = recall_score(all_targets, all_predictions, average='weighted')
+        f1 = f1_score(all_targets, all_predictions, average='weighted')
+
+        # Log to wandb if available
+        if self.wandb:
+            wandb.log({
+                'eval_loss': running_loss / total,
+                'eval_accuracy': correct / total,
+                'eval_precision': precision,
+                'eval_recall': recall,
+                'eval_f1': f1
+            })
+
+        return running_loss / total, correct / total, precision, recall, f1

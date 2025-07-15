@@ -1,0 +1,18 @@
+{
+  "id": "mnhhonghng/train-ml-pipeline",
+  "id_no": 86979261,
+  "title": "train_ml_pipeline",
+  "code_file": "train-ml-pipeline.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "keywords": [],
+  "dataset_sources": [],
+  "kernel_sources": [],
+  "competition_sources": [],
+  "model_sources": [],
+  "new_title": "Updated Title" 
+}

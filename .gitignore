@@ -12,3 +12,4 @@ wheels/
 .env
 wandb
 __pycache__/
+.kaggle/
